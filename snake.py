@@ -36,7 +36,6 @@ class SnakePart(pygame.sprite.Sprite):
         self.rect.topleft = self.pos
 
 
-
 class SnakeFull(pygame.sprite.Group):
     def __init__(self):
         super(SnakeFull, self).__init__()
@@ -46,7 +45,7 @@ class SnakeFull(pygame.sprite.Group):
              [grid_x // 2, grid_y // 2]])
         self.direction = np.array([[1, 0], [1, 0], [1, 0], [1, 0]])
         self.next_dir = self.direction[-1]
-        self.length = 2
+        self.length = 20
         self.speed = 0.1
         self.state = "alive"
 
@@ -87,9 +86,9 @@ class SnakeFull(pygame.sprite.Group):
             self.tail.dir = to_del[0].dir
             self.remove(to_del[0])
 
-        if self.head.rect.top <= 0 or self.head.rect.bottom >= SCREEN_Y:
+        if self.head.rect.top < 0 or self.head.rect.bottom >= SCREEN_Y:
             self.state = "dead"
-        if self.head.rect.left <= 0 or self.head.rect.right >= SCREEN_X:
+        if self.head.rect.left < 0 or self.head.rect.right >= SCREEN_X:
             self.state = "dead"
 
         if len(pygame.sprite.spritecollide(self.head, self, False)) > 1:
@@ -116,11 +115,11 @@ class SnakeFull(pygame.sprite.Group):
             screen.blit(sp.body, sp.pos)
 
 #MAIN FUNCTION
-SCREEN_X = 450
-SCREEN_Y = 450
+SCREEN_X = 400
+SCREEN_Y = 400
 
-grid_x = 30
-grid_y = 30
+grid_x = 20
+grid_y = 20
 
 sq_size = np.array([SCREEN_X // (grid_x+1), SCREEN_Y // (grid_y+1)])
 
@@ -146,7 +145,7 @@ def generate_number(n, thing):
     number_txt = font.render(str(number), True, white)
     return number, number_grid, number_txt
 
-number, number_grid, number_txt = generate_number(0, snake)
+number, number_grid, number_txt = generate_number(14, snake)
 screen.blit(number_txt, number_grid * sq_size - [0, font_size/5])
 pygame.display.update()
 while not(check_continue_event()):
@@ -159,6 +158,9 @@ while not(check_quit_event()):
     screen.blit(number_txt, number_grid * sq_size - [font_size/5 * (number>9), font_size/5])
     snake.plot()
     pygame.display.update()
+    # if check_continue_event():
+    #     while not(check_continue_event()):
+    #         pass
     if snake.state == "just_ate":
         number, number_grid, number_txt = generate_number(number, snake)
     if snake.state == "dead":
