@@ -26,6 +26,7 @@ def check_pause_event():
         return True
     return False
 
+
 class SnakePart(pygame.sprite.Sprite):
     def __init__(self, grid, dir, style):
         super(SnakePart, self).__init__()
@@ -112,7 +113,6 @@ class SnakeFull(pygame.sprite.Group):
             self.state = "dead"
         if len(pygame.sprite.spritecollide(self.head, self, False)) > 1:
             self.state = "dead"
-
 
     def update_dir(self, pressed_keys):
         if pressed_keys[K_LEFT] and self.head.dir[0]!=1:
