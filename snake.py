@@ -93,6 +93,7 @@ class SnakeFull(pygame.sprite.Group):
             self.head.grid = self.head.rect.topleft // sq_size
             self.head.dir = self.next_dir
             self.add(SnakePart(self.head.grid , self.head.dir, self.style))
+            self.grid = self.update_grid()
             if (self.head.grid == number_pos).all():
                 self.length += self.length_increase
                 self.state = "just_ate"
@@ -103,6 +104,7 @@ class SnakeFull(pygame.sprite.Group):
             self.tail.dir = to_del[0].dir
             self.tail.grid = to_del[0].grid
             self.remove(to_del[0])
+            self.grid = self.update_grid()
         # Check dying conditions
         if self.head.rect.top < 0 or self.head.rect.bottom >= SCREEN_Y:
             self.state = "dead"
@@ -110,8 +112,7 @@ class SnakeFull(pygame.sprite.Group):
             self.state = "dead"
         if len(pygame.sprite.spritecollide(self.head, self, False)) > 1:
             self.state = "dead"
-        # Update the grid squares occupied by the snake
-        self.grid = self.update_grid()
+
 
     def update_dir(self, pressed_keys):
         if pressed_keys[K_LEFT] and self.head.dir[0]!=1:
@@ -164,7 +165,7 @@ font_size = int(sq_size[1]*1.5)
 font = pygame.font.SysFont("ubuntumono",  font_size)
 
 # Create snake and first number
-snake = SnakeFull("round")  # style "square" or "round"
+snake = SnakeFull("square")  # style "square" or "round"
 number, number_grid, number_txt = generate_number(0, snake)
 screen.blit(number_txt, number_grid * sq_size - [0, font_size/5])
 snake.plot()
