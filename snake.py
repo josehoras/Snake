@@ -27,16 +27,20 @@ def check_pause_event():
     return False
 
 class SnakePart(pygame.sprite.Sprite):
-    def __init__(self, grid, dir):
+    def __init__(self, grid, dir, style):
         super(SnakePart, self).__init__()
         self.dir = dir
         self.body = pygame.Surface(sq_size)
         self.rect = self.body.get_rect()
+        if style == "square":
+            self.body.fill(white)
+            pygame.draw.rect(self.body, black, self.rect, 1)
+        if style == "round":
+            pygame.draw.circle(self.body, (0, 255, 0), sq_size//2 , min(sq_size)//2)
         # pygame.draw.rect(self.body, blue, self.rect, 0)
         # pygame.draw.line(self.body, white, (0,0), abs(sq_size * self.dir))
         # pygame.draw.line(self.body, white, (sq_size - (1,1)) * abs(self.dir[::-1]), sq_size - (1,1) )
-        self.body.fill(white)
-        pygame.draw.rect(self.body, black, self.rect, 1)
+
         self.grid = grid
         self.pos = (grid * sq_size).astype('float64')
         self.rect.topleft = self.pos
@@ -47,23 +51,25 @@ class SnakePart(pygame.sprite.Sprite):
 
 
 class SnakeFull(pygame.sprite.Group):
-    def __init__(self):
+    def __init__(self, style):
         super(SnakeFull, self).__init__()
         self.body_grid = np.array(
             [[grid_x // 2 - 2, grid_y // 2],
              [grid_x // 2 - 1, grid_y // 2],
              [grid_x // 2, grid_y // 2]])
         self.direction = np.array([[1, 0], [1, 0], [1, 0], [1, 0]])
+
+        self.style = style
         self.next_dir = self.direction[-1]
         self.length = 3
         self.length_increase = 10
         self.speed = 0.06
         self.state = "alive"
 
-        self.head = SnakePart(self.body_grid[-1], self.direction[-1])
-        self.tail = SnakePart(self.body_grid[0], self.direction[0])
+        self.head = SnakePart(self.body_grid[-1], self.direction[-1], self.style)
+        self.tail = SnakePart(self.body_grid[0], self.direction[0], self.style)
         for i in range(len(self.body_grid) - 1):
-            self.add(SnakePart(self.body_grid[i+1], self.direction[i+1]))
+            self.add(SnakePart(self.body_grid[i+1], self.direction[i+1], self.style))
 
         self.grid = self.update_grid()
 
@@ -86,7 +92,7 @@ class SnakeFull(pygame.sprite.Group):
                 (self.head.rect.topleft // sq_size != self.head.grid).any():
             self.head.grid = self.head.rect.topleft // sq_size
             self.head.dir = self.next_dir
-            self.add(SnakePart(self.head.grid , self.head.dir))
+            self.add(SnakePart(self.head.grid , self.head.dir, self.style))
             if (self.head.grid == number_pos).all():
                 self.length += self.length_increase
                 self.state = "just_ate"
@@ -158,7 +164,7 @@ font_size = int(sq_size[1]*1.5)
 font = pygame.font.SysFont("ubuntumono",  font_size)
 
 # Create snake and first number
-snake = SnakeFull()
+snake = SnakeFull("round")  # style "square" or "round"
 number, number_grid, number_txt = generate_number(0, snake)
 screen.blit(number_txt, number_grid * sq_size - [0, font_size/5])
 snake.plot()
